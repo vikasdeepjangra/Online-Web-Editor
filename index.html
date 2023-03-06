@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <style>
+      h1 {
+        font-family: sans-serif;
+      }
+      .CodeMirror {
+        height: 80vh;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Markdown editor</h1>
+    <textarea id="editor"></textarea>
+    <script>
+      let fileHandle;
+      const mdeditor = new SimpleMDE({
+        element: document.getElementById('editor'),
+        toolbar: [
+          {
+            name: 'openFile',
+            action: async () => {
+              const options = {
+                startIn: 'documents',
+                types: [
+                  {
+                    description: 'Markdown Files',
+                    accept: {
+                      'text/markdown': ['.md'],
+                    },
+                  },
+                ],
+              };
+              // Destructure the one-element array.
+              [fileHandle] = await window.showOpenFilePicker(options);
+
+              const file = await fileHandle.getFile();
+              const contents = await file.text();
+
+              mdeditor.value(contents);
+            },
+            className: 'fa fa-folder-open',
+            title: 'Open file',
+          },
+          {
+            name: 'saveFile',
+            action: async () => {
+              const contents = mdeditor.value();
+              const writable = await fileHandle.createWritable();
+              await writable.write(contents);
+              await writable.close();
+            },
+            className: 'fa fa-save',
+            title: 'Save file',
+          },
+          '|',
+          'bold',
+          'italic',
+          'strikethrough',
+          '|',
+          'heading-smaller',
+          'heading-bigger',
+          '|',
+          'unordered-list',
+          'ordered-list',
+          'quote',
+          'code',
+          '|',
+          'link',
+          'image',
+          '|',
+          'side-by-side',
+          'fullscreen',
+        ],
+      });
+      mdeditor.toggleSideBySide();
+    </script>
+  </body>
+</html>
